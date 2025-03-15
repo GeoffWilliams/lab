@@ -1,0 +1,10 @@
+quadlet_services:
+  mssql-pod:
+    kube_file: mssql-pod.kube.j2
+    pod_definition_file: mssql.yml.j2
+    files:
+    - path: /data/containers/mssql
+      state: directory
+      owner: 10001
+      group: 10001
+      mode: '0755'

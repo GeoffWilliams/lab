@@ -1,0 +1,37 @@
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-5.3.1
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: mssql
+  name: mssql
+spec:
+  containers:
+  - name: app
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+    - containerPort: 1433
+      hostPort: 1433
+    env:
+    - name: ACCEPT_EULA
+      value: Y
+
+    - name: MSSQL_PID
+      value: Developer
+
+    - name: MSSQL_SA_PASSWORD
+      value: "{{ lookup('ansible.builtin.file', '~/.mssql/lab_mssql_password.txt') }}"
+
+  # https://github.com/containers/podman/issues/17761#issuecomment-1845394695
+  # :z required for SELINUX
+    volumeMounts:
+    - mountPath: /var/opt/mssql/:z
+      name: mssql-data-vol
+  volumes:
+  - hostPath:
+      path: /data/containers/mssql
+      type: Directory
+    name: mssql-data-vol

@@ -1,0 +1,8 @@
+k3s_version: v1.31.5+k3s1
+extra_server_args: "--tls-san='k3s-lab.lab.asio,k3s-lab-server-0.lab.asio,lab-k3s-server-0' --disable traefik --disable servicelb"
+# extra_agent_args: ""
+api_endpoint: "k3s-lab-server-0.lab.asio"
+token: "{{ lookup('ansible.builtin.file', '~/.k3s-lab-token') }}"
+#bgp_as_number: 64800
+#bgb_iface: opt13
+ansible_user: geoff

@@ -1,0 +1,41 @@
+quadlet_services:
+  openldap-pod:
+    kube_file: openldap-pod.kube.j2
+    pod_definition_file: openldap.yml.j2
+    files:
+    - path: /data/containers/openldap
+      state: directory
+      owner: root
+      group: root
+      mode: '0755'
+    - path: /data/containers/openldap/secret
+      state: directory
+      owner: root
+      group: root
+      mode: '0755'
+    - path: /data/containers/openldap/ldif
+      state: directory
+      owner: root
+      group: root
+      mode: '0755'
+    cp:
+    - src: ../podman/files/openldap-pod/data/boot.ldif
+      dest: /data/containers/openldap/ldif/boot.ldif
+      owner: root
+      group: root
+      mode: '0755'
+    - src: /home/geoff/lab_ca/lab_ca.crt.pem
+      dest: /data/containers/openldap/secret/ca.pem
+      owner: root
+      group: root
+      mode: '0644'
+    - src: /home/geoff/lab_ca/lab_wildcard.crt.pem
+      dest: /data/containers/openldap/secret/tls.crt
+      owner: root
+      group: root
+      mode: '0644'
+    - src: /home/geoff/lab_ca/lab_wildcard.key.pem
+      dest: /data/containers/openldap/secret/tls.key
+      owner: root
+      group: root
+      mode: '0644'

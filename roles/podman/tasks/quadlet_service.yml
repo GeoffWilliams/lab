@@ -1,0 +1,46 @@
+# There is no nice way to dynamically create handlers, or pass a variable to a handler
+# so we just reboot on changes
+- name: kube file
+  ansible.builtin.template:
+    dest: "/etc/containers/systemd/{{ pod.value.kube_file | regex_replace('\\.j2$', '') }}"
+    src: "../podman/templates/{{ pod.key }}/systemd/{{ pod.value.kube_file }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reboot podman
+
+- name: pod definition file
+  ansible.builtin.template:
+    dest: "/etc/containers/systemd/{{ pod.value.pod_definition_file | regex_replace('\\.j2$', '') }}"
+    src: "../podman/templates/{{ pod.key }}/systemd/{{ pod.value.pod_definition_file }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reboot podman
+
+- name: "{{ pod.key }} files"
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: "{{ item.state }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop: "{{ pod.value.files | default([]) }}"
+  notify: reboot podman
+
+- name: "{{ pod.key }} cp"
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop: "{{ pod.value.cp | default([]) }}"
+  notify: reboot podman
+
+- name: "{{ pod.key }} service"
+  ansible.builtin.systemd_service:
+    state: started
+    daemon_reload: true
+    name: "{{ pod.key }}"
+    enabled: true

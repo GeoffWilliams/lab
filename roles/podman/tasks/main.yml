@@ -1,0 +1,42 @@
+# automatic DHCP hostnames in netavark 1.14 vs 1.12 on debian testing
+# manual registration for now
+# https://github.com/containers/netavark/issues/676
+
+
+- name: install podman
+  ansible.builtin.dnf:
+    name:
+    - podman
+    - python3
+    - nmap-ncat
+    state: latest
+
+- name: create /etc/containers
+  ansible.builtin.file:
+    path: /etc/containers
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: create /etc/containers/systemd
+  ansible.builtin.file:
+    path: /etc/containers/systemd
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: create /data/containers
+  ansible.builtin.file:
+    path: /data/containers
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+
+- include_tasks: "quadlet_service.yml"
+  loop: "{{ quadlet_services | default({}) | dict2items }}"
+  loop_control:
+    loop_var: pod

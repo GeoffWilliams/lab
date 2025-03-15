@@ -1,0 +1,102 @@
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-5.3.1
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: openldap
+  name: openldap
+  # annotations:
+  #   # https://github.com/containers/podman/issues/20467
+  #   # :z for SELINUX
+  #   bind-mount-options:
+  #   - /data/containers/openldap/secret:z
+  #   - /data/containers/openldap/ldif:z
+spec:
+  containers:
+  - name: app
+    image: docker.io/bitnami/openldap:latest
+    # command:
+    # - sleep
+    # - infinity
+    # # args:
+    # # - --loglevel
+    # # -  debug
+    ports:
+    - containerPort: 389
+      hostPort: 389
+    - containerPort: 636
+      hostPort: 636
+    env:
+    - name: BITNAMI_DEBUG
+      value: true
+
+    - name: LDAP_PORT_NUMBER
+      value: 389
+
+    - name: LDAP_ENABLE_TLS
+      value: "yes"
+    - name: LDAP_REQUIRE_TLS
+      value: "no"
+    - name: LDAP_LDAPS_PORT_NUMBER
+      value: 636
+    - name: LDAP_TLS_CERT_FILE
+      value: /secret/tls.crt
+    - name: LDAP_TLS_KEY_FILE
+      value: /secret/tls.key
+    - name: LDAP_TLS_CA_FILE
+      value: /secret/ca.pem
+
+    - name: LDAP_ALLOW_ANON_BINDING
+      value: "no"
+    - name: LDAP_ADMIN_USERNAME
+      value: admin
+    - name: LDAP_ADMIN_PASSWORD
+      value: admin-secret&5
+    # - name: LDAP_USERS
+    #   value: mds,zookeeper,kraft,kafka,schemaregistry,controlcenter,connect,ksql,flink,alice,bob,charles,eve
+    # - name: LDAP_PASSWORDS
+    #   value: mdsX,zookeeperX,kraftX,kafkaX,schemaregistryX,controlcenterX,connectX,ksqlX,flinkX,aliceX,bobX,charlesX,eveX
+    - name: LDAP_ROOT
+      value: dc=test,dc=com
+    - name: LDAP_ADMIN_DN
+      value: cn=admin,dc=test,dc=com
+
+    # whatdis? - name: LDAP_TLS_DH_PARAMS_FILE: File containing the DH parameters. No defaults.
+
+
+    # - name: LDAP_ORGANISATION
+    #   value: "Test Inc."
+    # - name: LDAP_DOMAIN
+    #   value: "test.com"
+    # - name: LDAP_ADMIN_PASSWORD
+    #   value: "confluentrox"
+    # - name: LDAP_CONFIG_PASSWORD
+    #   value: "confluentconfigrox"
+    # - name: LDAP_READONLY_USER
+    #   value: "true"
+    # - name: LDAP_READONLY_USER_USERNAME
+    #   value: "mds"
+    # - name: LDAP_READONLY_USER_PASSWORD
+    #   value: "Developer!"
+    # - name: LDAP_BASE_DN
+    #   value: "dc=test,dc=com"
+
+  # https://github.com/containers/podman/issues/17761#issuecomment-1845394695
+  # :z required for SELINUX
+    volumeMounts:
+    - mountPath: /secret:z
+      name: openldap-secret-vol
+    - mountPath: /ldifs:z
+      name: openldap-ldif-vol
+  volumes:
+  - hostPath:
+      path: /data/containers/openldap/secret
+      type: Directory
+    name: openldap-secret-vol
+  - hostPath:
+      path: /data/containers/openldap/ldif
+      type: Directory
+    name: openldap-ldif-vol

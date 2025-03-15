@@ -1,0 +1,14 @@
+k3s_cluster:
+  children:
+    server:
+      hosts:
+        k3s-lab-server-0.lab.asio:
+
+    agent:
+      hosts:
+        k3s-lab-agent-0.lab.asio:
+        k3s-lab-agent-1.lab.asio:
+
+k3s_lab:
+  children:
+    k3s_cluster:
