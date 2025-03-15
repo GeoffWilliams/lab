@@ -10,6 +10,7 @@
 * PostgreSQL server (todo)
 * Confluent Platform VMs (infra only - no software deployment)
 * Lab Kubernetes cluster (K3S)
+* Ansible expects your lab CA at ~/lab_ca for ldap server deployment
 
 ## VM creation (Windows)
 * `scripts` directory
